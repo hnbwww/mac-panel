@@ -1,17 +1,30 @@
 # Mac Panel 全自动安装指南
 
-## 🚀 超级简单一键安装
+<div align="center">
+
+## 🚀 一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
 ```
 
-**就这么一条命令！** 脚本会自动：
-- 📥 下载安装脚本
-- 🔧 检查系统环境
-- 📦 安装所有依赖包
-- 🚀 完成全部配置
-- ✅ 启动 Mac Panel 服务
+**就这么一条命令！** ⚡
+
+脚本会自动完成以下操作：
+- 📥 从 GitHub 下载最新代码
+- 🔧 检查系统环境（macOS 12.0+）
+- 📦 安装所有依赖（Homebrew、Node.js、git）
+- 👤 创建服务用户（macpanel）
+- 🔨 构建前后端项目
+- ⚙️ 配置环境和服务
+- 🚀 启动 Mac Panel 服务
+
+**安装完成后访问**：http://localhost:3001
+**默认账号**：admin / admin123
+
+---
+
+</div>
 
 ## 📋 系统要求
 

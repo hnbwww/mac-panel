@@ -2,6 +2,40 @@
 
 类似宝塔面板的 Mac 平台服务器管理系统，现已升级到生产可用版本。
 
+## 🚀 快速开始
+
+### 一键安装（推荐）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+```
+
+**就这么简单！** 安装脚本会自动：
+- 📥 从 GitHub 下载最新代码
+- 🔧 检查系统环境（macOS 12.0+）
+- 📦 安装所有依赖（Homebrew、Node.js、git）
+- 👤 创建服务用户和配置权限
+- 🔨 构建并启动服务
+
+**安装完成后访问**：http://localhost:3001
+**默认账号**：admin / admin123
+
+### 手动安装
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/HYweb3/mac-panel.git
+cd mac-panel
+
+# 2. 运行安装脚本
+chmod +x install.sh
+sudo ./install.sh
+```
+
+详细安装文档请查看：[AUTO_INSTALL_GUIDE.md](./AUTO_INSTALL_GUIDE.md)
+
+---
+
 ## ✨ 新增功能 (v2.0)
 
 ### 核心增强
