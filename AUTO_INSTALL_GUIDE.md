@@ -1,6 +1,19 @@
 # Mac Panel 全自动安装指南
 
-## 🚀 快速开始
+## 🚀 超级简单一键安装
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/install.sh | sudo bash
+```
+
+**就这么一条命令！** 脚本会自动：
+- 📥 下载安装脚本
+- 🔧 检查系统环境
+- 📦 安装所有依赖包
+- 🚀 完成全部配置
+- ✅ 启动 Mac Panel 服务
+
+## 📋 系统要求
 
 ### 一键安装（推荐）
 
