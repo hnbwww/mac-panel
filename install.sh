@@ -571,6 +571,85 @@ EOF
     fi
 }
 
+# 创建启动脚本
+create_launch_scripts() {
+    log_step "创建启动脚本"
+
+    PROJECT_DIR="/opt/mac-panel"
+
+    # 创建后端启动脚本
+    cat > "$PROJECT_DIR/start-backend.sh" << 'EOF'
+#!/bin/bash
+cd "$PROJECT_DIR/backend"
+export NODE_ENV=production
+nohup node dist/app.js > "$PROJECT_DIR/backend/backend.log" 2>&1 &
+echo $! > "$PROJECT_DIR/backend/backend.pid"
+EOF
+
+    # 创建启动脚本
+    cat > "$PROJECT_DIR/start.sh" << 'EOF'
+#!/bin/bash
+# Mac Panel 快速启动脚本
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "🚀 启动 Mac Panel..."
+
+# 停止现有服务
+if [ -f "$PROJECT_DIR/backend/backend.pid" ]; then
+    kill $(cat "$PROJECT_DIR/backend/backend.pid") 2>/dev/null || true
+fi
+pkill -f "mac-panel/backend.*app.js" || true
+
+# 启动后端
+cd "$PROJECT_DIR/backend"
+export NODE_ENV=production
+nohup node dist/app.js > backend.log 2>&1 &
+BACKEND_PID=$!
+echo $BACKEND_PID > backend.pid
+
+sleep 2
+
+# 检查服务状态
+if ps -p $BACKEND_PID > /dev/null; then
+    echo "✅ Mac Panel 已启动"
+    echo "📱 访问地址: http://localhost:3001"
+else
+    echo "❌ 启动失败，请检查日志"
+    cat backend.log
+    exit 1
+fi
+EOF
+
+    chmod +x "$PROJECT_DIR/start-backend.sh"
+    chmod +x "$PROJECT_DIR/start.sh"
+
+    log_success "启动脚本已创建"
+}
+
+# 配置防火墙
+configure_firewall() {
+    log_step "配置防火墙"
+
+    # 检查防火墙是否开启
+    if /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate 2>/dev/null | grep -q "enabled: 1"; then
+        log_info "防火墙已启用，添加端口规则..."
+
+        # 添加端口规则
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/nginx 2>/dev/null || true
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add 3001 2>/dev/null || true
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add 5173 2>/dev/null || true
+
+        # 允许传入连接
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on 2>/dev/null || true
+
+        log_success "防火墙规则已添加"
+    else
+        log_info "防火墙未启用，跳过配置"
+        log_warn "如需启用防火墙，请运行: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on"
+    fi
+}
+
 
 # 停止现有服务
 stop_existing_services() {
@@ -768,6 +847,44 @@ show_completion() {
     echo ""
 }
 
+# 安装前检查
+pre_install_check() {
+    log_step "安装前检查"
+
+    # 检查磁盘空间
+    AVAILABLE_SPACE=$(df / | tail -1 | awk '{print $4}')
+    REQUIRED_SPACE=2097152 # 2GB in KB
+
+    if [ "$AVAILABLE_SPACE" -lt "$REQUIRED_SPACE" ]; then
+        log_error "磁盘空间不足，至少需要 2GB 可用空间"
+        exit 1
+    fi
+
+    log_success "磁盘空间检查通过"
+
+    # 检查网络连接
+    if ! ping -c 1 github.com > /dev/null 2>&1; then
+        log_warn "无法连接到 GitHub，可能会影响项目克隆"
+        log_info "如果克隆失败，请检查网络连接"
+    else
+        log_success "网络连接正常"
+    fi
+
+    # 检查是否有冲突的服务
+    if pgrep -f "backend.*app.js" > /dev/null; then
+        log_warn "检测到现有 Mac Panel 服务"
+        read -p "是否停止现有服务并继续安装? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            pkill -f "backend.*app.js" || true
+            log_success "现有服务已停止"
+        else
+            log_error "安装已取消"
+            exit 1
+        fi
+    fi
+}
+
 # 主函数
 main() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
@@ -777,6 +894,7 @@ main() {
     echo ""
 
     # 安装流程
+    pre_install_check
     check_sudo
     check_macos_version
     check_homebrew
@@ -789,6 +907,8 @@ main() {
     init_database
     setup_permissions
     setup_sudoers
+    create_launch_scripts
+    configure_firewall
     stop_existing_services
     start_services
     test_services
