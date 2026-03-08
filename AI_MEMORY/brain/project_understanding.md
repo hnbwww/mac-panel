@@ -664,3 +664,57 @@ sudo ./install.sh myuser
 **安全提示**:
 - Yolo 命令跳过权限检查，仅用于开发环境
 - 生产环境应使用完整的 claude 命令
+
+## 最新更新（2026-03-09 01:30）
+
+### 网络一键安装系统 ✅
+**功能实现**:
+- ✅ 创建 web-install.sh 独立网络安装脚本（472行）
+- ✅ 支持从 GitHub 直接下载安装：`curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash`
+- ✅ 完整的全自动安装流程
+- ✅ 项目已上传到 GitHub 公开仓库
+- ✅ 更新 AUTO_INSTALL_GUIDE.md 突出一键安装
+
+**GitHub 仓库信息**:
+- **仓库地址**: https://github.com/HYweb3/mac-panel
+- **所有者**: HYweb3
+- **状态**: 公开仓库
+- **文件数**: 205+ 文件
+- **代码行数**: 84,000+ 行
+
+**网络一键安装功能**:
+```bash
+# 单命令安装（从网络下载并自动安装所有依赖）
+curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+```
+
+**web-install.sh 特性**:
+- ✅ 完全独立运行（无需本地文件）
+- ✅ 自动检测和安装 Homebrew
+- ✅ 自动安装 Node.js 18+ LTS
+- ✅ 自动安装 git 等必要工具
+- ✅ 从 GitHub 克隆项目
+- ✅ 创建服务用户（macpanel）
+- ✅ 配置文件权限和 sudoers
+- ✅ 构建前后端项目
+- ✅ 初始化数据库
+- ✅ 配置环境变量（自动检测本机IP）
+- ✅ 创建管理命令（mac-panel）
+- ✅ 启动服务并验证
+
+**安装文档**:
+- ✅ `AUTO_INSTALL_GUIDE.md` - 更新为突显网络一键安装
+- ✅ `INSTALL_CHECKLIST.md` - 396行详细检查清单
+- ✅ `web-install.sh` - 472行独立安装脚本
+
+**修改文件**:
+- ✅ `web-install.sh` - 新建（472行）
+- ✅ `AUTO_INSTALL_GUIDE.md` - 更新（突出网络安装）
+- ✅ GitHub 仓库 - 创建并推送所有代码
+
+**用户价值**:
+- 🚀 **极简安装**: 一条命令完成所有安装
+- 📦 **自动依赖**: 自动安装 Homebrew、Node.js、git
+- 🌐 **网络分发**: 直接从 GitHub 下载最新版本
+- 🔄 **易更新**: 使用 git pull 或 mac-panel update
+- 📚 **完整文档**: 多种安装方法和详细指南
