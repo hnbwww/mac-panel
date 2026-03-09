@@ -14,15 +14,15 @@
 - ✅ 创建详细安装检查清单
 
 **GitHub 仓库**:
-- 仓库地址: https://github.com/HYweb3/mac-panel
-- 所有者: HYweb3
+- 仓库地址: https://github.com/hnbwww/mac-panel
+- 所有者: hnbwww
 - 状态: 公开仓库
 - 文件数: 205+ 文件
 - 代码行数: 84,000+ 行
 
 **一键安装命令**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
 ```
 
 **web-install.sh 功能**:

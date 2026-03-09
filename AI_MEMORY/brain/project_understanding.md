@@ -670,14 +670,14 @@ sudo ./install.sh myuser
 ### 网络一键安装系统 ✅
 **功能实现**:
 - ✅ 创建 web-install.sh 独立网络安装脚本（472行）
-- ✅ 支持从 GitHub 直接下载安装：`curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash`
+- ✅ 支持从 GitHub 直接下载安装：`curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash`
 - ✅ 完整的全自动安装流程
 - ✅ 项目已上传到 GitHub 公开仓库
 - ✅ 更新 AUTO_INSTALL_GUIDE.md 突出一键安装
 
 **GitHub 仓库信息**:
-- **仓库地址**: https://github.com/HYweb3/mac-panel
-- **所有者**: HYweb3
+- **仓库地址**: https://github.com/hnbwww/mac-panel
+- **所有者**: hnbwww
 - **状态**: 公开仓库
 - **文件数**: 205+ 文件
 - **代码行数**: 84,000+ 行
@@ -685,7 +685,7 @@ sudo ./install.sh myuser
 **网络一键安装功能**:
 ```bash
 # 单命令安装（从网络下载并自动安装所有依赖）
-curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
 ```
 
 **web-install.sh 特性**:

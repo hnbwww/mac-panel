@@ -32,11 +32,11 @@ sudo -v
 ### 第一步：获取项目
 ```bash
 # 方式1: 从 GitHub 克隆（推荐）
-git clone https://github.com/HYweb3/mac-panel.git
+git clone https://github.com/hnbwww/mac-panel.git
 cd mac-panel
 
 # 方式2: 从 GitHub 下载压缩包
-# 访问 https://github.com/HYweb3/mac-panel
+# 访问 https://github.com/hnbwww/mac-panel
 # 下载并解压到目标目录
 ```
 
@@ -324,7 +324,7 @@ sudo rm /etc/sudoers.d/mac-panel
 ```
 
 ### 社区支持
-- **GitHub Issues**: https://github.com/HYweb3/mac-panel/issues
+- **GitHub Issues**: https://github.com/hnbwww/mac-panel/issues
 - **文档**: 查看项目 README.md 和其他文档文件
 - **日志**: 使用 `mac-panel logs` 获取详细信息
 

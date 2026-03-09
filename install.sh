@@ -21,7 +21,7 @@ NC='\033[0m' # No Color
 # 全局变量
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="/opt/mac-panel"
-GITHUB_REPO="https://github.com/HYweb3/mac-panel.git"
+GITHUB_REPO="https://github.com/hnbwww/mac-panel.git"
 GITHUB_BACKUP="https://gitee.com/hyweb3/mac-panel.git"
 
 # 进度条

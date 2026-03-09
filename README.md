@@ -7,7 +7,7 @@
 ### 一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
 ```
 
 **就这么简单！** 安装脚本会自动：
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/HYweb3/mac-panel.git
+git clone https://github.com/hnbwww/mac-panel.git
 cd mac-panel
 
 # 2. 运行安装脚本

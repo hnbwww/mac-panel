@@ -5370,7 +5370,7 @@ npm install
 ### 实现功能
 
 **1. 网络一键安装**
-- **命令**: `curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash`
+- **命令**: `curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash`
 - **特点**: 完全独立运行，无需本地文件
 - **自动化**: 
   - 检测 macOS 版本（要求 12.0+）
@@ -5387,8 +5387,8 @@ npm install
   - 启动服务并验证
 
 **2. GitHub 仓库创建**
-- **仓库地址**: https://github.com/HYweb3/mac-panel
-- **所有者**: HYweb3
+- **仓库地址**: https://github.com/hnbwww/mac-panel
+- **所有者**: hnbwww
 - **状态**: 公开仓库
 - **文件数**: 205+ 文件
 - **代码行数**: 84,000+ 行
@@ -5457,7 +5457,7 @@ git push origin master
 
 **仓库状态**:
 - 分支: master
-- 远程: origin (https://github.com/HYweb3/mac-panel.git)
+- 远程: origin (https://github.com/hnbwww/mac-panel.git)
 - 状态: 与远程同步
 - 工作区: 干净
 
@@ -5473,12 +5473,12 @@ git push origin master
 
 **新用户（推荐）**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
 ```
 
 **已有项目**:
 ```bash
-git clone https://github.com/HYweb3/mac-panel.git
+git clone https://github.com/hnbwww/mac-panel.git
 cd mac-panel
 sudo ./install.sh
 ```
