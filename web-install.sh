@@ -554,7 +554,7 @@ case "$ACTION" in
         ;;
     status)
         echo "📊 Mac Panel 状态:"
-        if pgrep -f "mac-panel/backend.*app.js" > /dev/null; then
+        if pgrep -f "node.*app.js" > /dev/null; then
             echo "✅ 运行中"
             echo "   前端: http://localhost:5173  |  后端: http://localhost:3001"
         else
@@ -669,7 +669,7 @@ detect_progress() {
     [ -d "$PROJECT_DIR/frontend/node_modules" ] && [ -d "$PROJECT_DIR/frontend/dist" ] && step=3
     [ -f "$PROJECT_DIR/backend/.env" ] && [ -f "$PROJECT_DIR/frontend/.env" ] && step=4
     [ -f "$PROJECT_DIR/backend/data/db.json" ] && step=5
-    pgrep -f "mac-panel/backend.*app.js" > /dev/null 2>&1 && step=6
+    pgrep -f "node.*app.js" > /dev/null 2>&1 && step=6
 
     echo $step
 }

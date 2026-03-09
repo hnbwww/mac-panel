@@ -1,0 +1,62 @@
+#!/bin/bash
+PROJECT_DIR="/opt/mac-panel"
+ACTION="$1"
+
+case "$ACTION" in
+    start)
+        echo "🚀 启动 Mac Panel..."
+        # 以 macpanel 用户启动后端
+        if id macpanel &>/dev/null; then
+            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/logs/backend.log 2>&1 &"
+        else
+            cd "$PROJECT_DIR/backend"
+            export NODE_ENV=production
+            nohup node dist/app.js > logs/backend.log 2>&1 &
+        fi
+        sleep 2
+        echo "✅ Mac Panel 已启动"
+        # 获取本机 IP
+        LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
+        echo "📱 前端: http://localhost:5173"
+        echo "📱 局域网: http://$LOCAL_IP:5173"
+        ;;
+    stop)
+        echo "⏹️  停止 Mac Panel..."
+        pkill -f "mac-panel/backend.*app.js" || true
+        pkill -f "vite" || true
+        sleep 1
+        echo "✅ Mac Panel 已停止"
+        ;;
+    restart)
+        echo "🔄 重启 Mac Panel..."
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    status)
+        echo "📊 Mac Panel 状态:"
+        if pgrep -f "node.*app.js" > /dev/null; then
+            echo "✅ 运行中"
+            echo "   前端: http://localhost:5173  |  后端: http://localhost:3001"
+        else
+            echo "❌ 未运行"
+        fi
+        ;;
+    logs)
+        echo "📝 最新日志:"
+        tail -50 "$PROJECT_DIR/backend/logs/backend.log"
+        ;;
+    update)
+        echo "🔄 更新 Mac Panel..."
+        cd "$PROJECT_DIR"
+        git pull
+        cd backend && npm install && npm run build
+        $0 restart
+        echo "✅ 更新完成"
+        ;;
+    *)
+        echo "Mac Panel 管理工具"
+        echo ""
+        echo "用法: mac-panel {start|stop|restart|status|logs|update}"
+        ;;
+esac
