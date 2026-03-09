@@ -335,11 +335,20 @@ export const compressFiles = async (paths: string[], targetPath: string, format:
       reject(err);
     });
 
+    archive.on('warning', (err) => {
+      console.warn('[Compress] Archive warning:', err);
+    });
+
     archive.pipe(output);
 
     paths.forEach((filePath) => {
       const validPath = validatePath(filePath);
-      archive.file(validPath, { name: path.basename(filePath) });
+      const stat = fs.statSync(validPath);
+      if (stat.isDirectory()) {
+        archive.directory(validPath, path.basename(filePath));
+      } else {
+        archive.file(validPath, { name: path.basename(filePath) });
+      }
     });
 
     archive.finalize();

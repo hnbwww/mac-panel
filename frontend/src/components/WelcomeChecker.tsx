@@ -9,7 +9,7 @@ interface WelcomeCheckerProps {
 const WelcomeChecker: React.FC<WelcomeCheckerProps> = ({ children }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [loading, setLoading] = useState(true);
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || '';
   const token = localStorage.getItem('token');
 
   useEffect(() => {

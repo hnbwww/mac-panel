@@ -12,8 +12,9 @@ pkill -f "mac-panel/backend.*app.js" || true
 
 # 启动后端
 cd "$PROJECT_DIR/backend"
+mkdir -p logs
 export NODE_ENV=production
-nohup node dist/app.js > backend.log 2>&1 &
+nohup node dist/app.js > logs/backend.log 2>&1 &
 BACKEND_PID=$!
 echo $BACKEND_PID > backend.pid
 
@@ -21,9 +22,13 @@ sleep 2
 
 if ps -p $BACKEND_PID > /dev/null; then
     echo "✅ Mac Panel 已启动"
-    echo "📱 访问地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)"
+    # 获取本机 IP
+LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
+echo "📱 访问地址:"
+echo "   本地: http://localhost:5173"
+echo "   局域网: http://$LOCAL_IP:5173"
 else
     echo "❌ 启动失败，请检查日志"
-    cat backend.log
+    cat logs/backend.log
     exit 1
 fi

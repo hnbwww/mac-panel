@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalEditor } from '../context/GlobalEditorContext';
 import { Table, Button, Input, Modal, Form, message, Popconfirm, Space, Tag, Dropdown, Breadcrumb, Alert, Progress, Upload, Radio, Drawer, List, Empty, Spin, Typography } from 'antd';
+import { HomeOutlined, FolderOutlined, FileOutlined, FileTextOutlined, DeleteOutlined, EditOutlined, UploadOutlined, DownloadOutlined, StarOutlined, StarFilled, ReloadOutlined, UndoOutlined, SearchOutlined, CopyOutlined, ScissorOutlined, FolderOpenOutlined, InfoCircleOutlined, VideoCameraOutlined, AudioOutlined, FilePdfOutlined, FileWordOutlined, FileExcelOutlined, FilePptOutlined, FileMarkdownOutlined, FileZipOutlined, DatabaseOutlined, ApiOutlined, SettingOutlined, CodeOutlined, SnippetsOutlined, FileAddOutlined, FolderAddOutlined, PictureOutlined } from '@ant-design/icons';
 import { useFileStore } from '../store';
 import Editor from '@monaco-editor/react';
 import FileProperties from '../components/FileProperties';
@@ -1394,6 +1395,7 @@ export default function Files() {
             }}
             trigger={['click']}
           >
+            <Button icon={<FileAddOutlined />}>新建</Button>
           </Dropdown>
           <Button icon={<CodeOutlined />} onClick={handleOpenTerminal} title="在当前目录打开终端">终端</Button>
         </Space>

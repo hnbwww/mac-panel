@@ -39,7 +39,7 @@ import { addAdditionalSoftware } from './services/additionalSoftware';
 import { enhanceSoftwareDetection } from './services/detectionEnhancer';
 import { fixServerDatabaseConfigs } from './services/fixServerDatabaseConfigs';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // 设置全局错误处理
 setupGlobalErrorHandlers();
@@ -54,26 +54,13 @@ server.timeout = 10 * 60 * 1000; // 10 分钟
 server.keepAliveTimeout = 10 * 60 * 1000; // 10 分钟
 server.headersTimeout = 11 * 60 * 1000; // 11 分钟（略长于 keepAliveTimeout）
 
-// CORS configuration
-const allowedOrigins = [
-  `http://localhost:${FRONTEND_PORT}`,
-  `http://localhost:5174`,
-  `http://192.168.0.77:${FRONTEND_PORT}`,
-  `http://192.168.0.77:5174`,
-  `http://127.0.0.1:${FRONTEND_PORT}`,
-  `http://127.0.0.1:5174`
-];
-
+// CORS configuration - 允许所有来源
 app.use(cors({
   origin: function (origin, callback) {
     // 允许没有 origin 的请求（比如移动应用或Postman）
     if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    // 允许所有来源
+    return callback(null, true);
   },
   credentials: true
 }));

@@ -69,7 +69,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { key: '/database-admin', icon: <DatabaseOutlined />, label: '数据库管理' },
     { key: '/software', icon: <DownloadOutlined />, label: '软件管理' },
     { key: '/software-admin', icon: <SettingOutlined />, label: '软件配置' },
-    { key: '/settings', icon: <SettingOutlined />, label: '操作管理' },
+    // { key: '/settings', icon: <SettingOutlined />, label: '操作管理' },
     { key: '/monitor', icon: <MonitorOutlined />, label: '系统监控' },
     { key: '/processes', icon: <AppstoreOutlined />, label: '进程管理' },
     { key: '/tasks', icon: <ScheduleOutlined />, label: '任务中心' },

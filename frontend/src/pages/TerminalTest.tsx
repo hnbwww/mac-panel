@@ -20,8 +20,11 @@ export default function TerminalTestPage() {
     addLog('Component mounted');
 
     const token = localStorage.getItem('token');
-    const WS_BASE_URL = import.meta.env.VITE_WS_URL;
-    const wsUrl = `${WS_BASE_URL}/ws/terminal?token=${token}`;
+    const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+    // 如果URL已包含路径则不重复添加
+    const wsUrl = WS_BASE_URL.includes('/ws')
+      ? `${WS_BASE_URL}/terminal?token=${token}`
+      : `${WS_BASE_URL}/ws/terminal?token=${token}`;
 
     addLog(`Connecting to: ${wsUrl?.replace(token || '', '***')}`);
 

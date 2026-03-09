@@ -167,7 +167,40 @@ class DatabaseService {
     this.dbPath = dbPath || path.join(process.cwd(), 'data', 'db.json');
     this.ensureDataDir();
     this.db = this.initializeDB();
+    this.migrateDatabase();
     this.initializeDefaultData();
+  }
+
+  private migrateDatabase() {
+    // 确保所有数据库字段存在（迁移旧数据库）
+    this.db.read();
+    const data = this.db.data as any;
+    if (!data.operation_logs) data.operation_logs = [];
+    if (!data.scheduled_tasks) data.scheduled_tasks = [];
+    if (!data.task_executions) data.task_executions = [];
+    if (!data.databases) data.databases = [];
+    if (!data.tasks) data.tasks = [];
+    // 如果用户为空且未初始化，创建默认数据
+    if ((!data.users || data.users.length === 0) && (!data.settings?.initialized)) {
+      const bcrypt = require('bcryptjs');
+      data.roles = [
+        { id: 'role_admin', name: '管理员', permissions: ['*'], created_at: new Date().toISOString() },
+        { id: 'role_user', name: '普通用户', permissions: ['read', 'write'], created_at: new Date().toISOString() },
+        { id: 'role_viewer', name: '只读用户', permissions: ['read'], created_at: new Date().toISOString() }
+      ];
+      data.users = [{
+        id: 'user_admin',
+        username: 'admin',
+        email: 'admin@example.com',
+        role_id: 'role_admin',
+        status: 'active',
+        password_hash: bcrypt.hashSync('admin123', 10),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }];
+      data.settings = { initialized: true };
+    }
+    this.db.write();
   }
 
   private ensureDataDir() {

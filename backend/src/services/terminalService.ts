@@ -2,7 +2,11 @@ import { WebSocket, WebSocketServer } from 'ws';
 import * as os from 'os';
 import * as pty from 'node-pty-prebuilt-multiarch';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 import { terminalLogger } from './terminalLogger';
+
+// 加载环境变量
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 interface TerminalSession {
   id: string;

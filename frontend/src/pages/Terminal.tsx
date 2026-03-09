@@ -80,11 +80,13 @@ export default function TerminalPage() {
     });
 
     // 使用专门的终端WebSocket URL
-    const TERMINAL_WS_URL = import.meta.env.VITE_TERMINAL_WS_URL;
-    const wsUrl = `${TERMINAL_WS_URL}/ws/terminal?token=${token}`;
+    const TERMINAL_WS_URL = import.meta.env.VITE_TERMINAL_WS_URL || 'ws://localhost:3002';
+    // 如果URL已包含路径则不重复添加
+    const wsUrl = TERMINAL_WS_URL.includes('/ws/terminal')
+      ? `${TERMINAL_WS_URL}?token=${token}`
+      : `${TERMINAL_WS_URL}/ws/terminal?token=${token}`;
 
     console.log('[Terminal] Final WebSocket URL:', wsUrl?.replace(token || '', '***'));
-    console.log('[Terminal] Expected: ws://192.168.0.7:3002/ws/terminal');
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;

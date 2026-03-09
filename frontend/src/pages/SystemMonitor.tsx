@@ -77,8 +77,12 @@ export default function SystemMonitor() {
 
     // 建立 WebSocket 连接
     const token = localStorage.getItem('token');
-    const WS_BASE_URL = import.meta.env.VITE_WS_URL;
-    const ws = new WebSocket(`${WS_BASE_URL}/ws/system-stats?token=${token}`);
+    const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+    // 如果URL已包含路径则不重复添加
+    const wsUrl = WS_BASE_URL.includes('/ws')
+      ? `${WS_BASE_URL}/system-stats?token=${token}`
+      : `${WS_BASE_URL}/ws/system-stats?token=${token}`;
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('WebSocket connected');
@@ -345,12 +349,7 @@ export default function SystemMonitor() {
               colorField="type"
               radius={0.8}
               innerRadius={0.6}
-              label={{
-                type: 'inner',
-                offset: '-50%',
-                content: '{value}%',
-                style: { fontSize: 14, textAlign: 'center' },
-              }}
+              label={false}
               height={250}
               legend={{ position: 'bottom' }}
             />

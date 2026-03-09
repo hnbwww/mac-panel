@@ -256,8 +256,11 @@ export default function BrowserPage() {
 
     const token = localStorage.getItem('token');
     // 浏览器 WebSocket 使用单独的端口，可通过 .env 中的 VITE_BROWSER_WS_URL 配置
-    const BROWSER_WS_URL = import.meta.env.VITE_BROWSER_WS_URL;
-    const wsUrl = `${BROWSER_WS_URL}/ws/browser?token=${token}&targetId=${targetId}`;
+    const BROWSER_WS_URL = import.meta.env.VITE_BROWSER_WS_URL || 'ws://localhost:3003';
+    // 如果URL已包含路径则不重复添加
+    const wsUrl = BROWSER_WS_URL.includes('/ws/browser')
+      ? `${BROWSER_WS_URL}?token=${token}&targetId=${targetId}`
+      : `${BROWSER_WS_URL}/ws/browser?token=${token}&targetId=${targetId}`;
 
     console.log('[Browser] WebSocket URL:', wsUrl.replace(token, '***'));
     const ws = new WebSocket(wsUrl);

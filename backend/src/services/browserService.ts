@@ -1,5 +1,10 @@
 import CDP from 'chrome-remote-interface';
 import { WebSocket, WebSocketServer } from 'ws';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// 加载环境变量
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 interface BrowserSession {
   id: string;
