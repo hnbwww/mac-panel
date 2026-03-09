@@ -466,6 +466,7 @@ configure_firewall() {
 create_management_scripts() {
     log_step "创建管理命令"
 
+    mkdir -p /usr/local/bin
     cat > /usr/local/bin/mac-panel << 'EOF'
 #!/bin/bash
 PROJECT_DIR="/opt/mac-panel"
@@ -525,7 +526,6 @@ case "$ACTION" in
 esac
 EOF
 
-    mkdir -p /usr/local/bin
     chmod +x /usr/local/bin/mac-panel
     log_success "管理命令已创建: mac-panel"
 }
