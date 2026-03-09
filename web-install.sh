@@ -363,18 +363,15 @@ create_default_user() {
     cd "$PROJECT_DIR/backend"
 
     # 检查是否已有用户
-    if [ -s "data/db.json" ] && grep -q '"users": \[' "data/db.json"; then
-        # 检查 users 数组是否为空
-        if python3 -c "import json; users=json.load(open('data/db.json'))['users']; exit(0 if users else 1)" 2>/dev/null; then
-            log_info "用户已存在，跳过创建"
-            return
-        fi
+    if python3 -c "import json; users=json.load(open('data/db.json'))['users']; exit(len(users))" 2>/dev/null | grep -q "^[1-9]"; then
+        log_info "用户已存在，跳过创建"
+        return
     fi
 
     log_info "创建默认管理员用户..."
 
     # 生成密码哈希
-    PASSWORD_HASH=$(node -e "const bcrypt=require('bcrypt');bcrypt.hash('admin123',10).then(h=>console.log(h))" 2>/dev/null)
+    PASSWORD_HASH=$(node -e "const bcrypt=require('bcryptjs');bcrypt.hash('admin123',10).then(h=>console.log(h))" 2>/dev/null)
 
     if [ -z "$PASSWORD_HASH" ]; then
         log_warn "无法生成密码哈希，跳过创建用户"
