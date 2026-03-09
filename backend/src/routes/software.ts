@@ -39,13 +39,28 @@ router.get('/list', async (req: AuthRequest, res: Response) => {
     // 转换为前端需要的格式，并检查状态
     const softwareList = await Promise.all(
       configs.map(async (config) => {
+        // 实时检测软件是否已安装
+        let isInstalled = config.installed;
+        if ('check_installed' in config.commands && config.commands.check_installed) {
+          try {
+            const installCheck = await executeCommand(config.commands.check_installed as string, 5000);
+            if (installCheck.success && installCheck.output.trim()) {
+              isInstalled = true;
+            } else {
+              isInstalled = false;
+            }
+          } catch (e) {
+            isInstalled = false;
+          }
+        }
+
         const software = {
           id: config.name,
           name: config.name,
           displayName: config.display_name,
           description: config.description,
           category: config.category,
-          installed: config.installed,
+          installed: isInstalled,
           version: config.version,
           status: config.status,
           configPath: config.config_path,
