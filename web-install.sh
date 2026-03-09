@@ -526,7 +526,7 @@ case "$ACTION" in
         echo "🚀 启动 Mac Panel..."
         # 以 macpanel 用户启动后端
         if id macpanel &>/dev/null; then
-            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/logs/backend.log 2>&1 &"
+            sudo -u macpanel bash -c "mkdir -p /opt/mac-panel/backend/logs && cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js >> /opt/mac-panel/backend/logs/backend.log 2>&1 &"
         else
             cd "$PROJECT_DIR/backend"
             export NODE_ENV=production
