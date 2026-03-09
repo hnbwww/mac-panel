@@ -504,6 +504,7 @@ case "$ACTION" in
 esac
 EOF
 
+    mkdir -p /usr/local/bin
     chmod +x /usr/local/bin/mac-panel
     log_success "管理命令已创建: mac-panel"
 }
