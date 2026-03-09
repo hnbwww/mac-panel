@@ -3,7 +3,7 @@
 ################################################################################
 # Mac Panel 网络一键安装脚本 v3.0
 # 可以直接从网络下载并运行
-# 使用方法: curl -fsSL https://raw.githubusercontent.com/HYweb3/mac-panel/master/web-install.sh | sudo bash
+# 使用方法: curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
 ################################################################################
 
 set -e
@@ -19,8 +19,8 @@ NC='\033[0m' # No Color
 # 全局变量
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="/opt/mac-panel"
-GITHUB_REPO="https://github.com/HYweb3/mac-panel.git"
-GITHUB_RAW="https://raw.githubusercontent.com/HYweb3/mac-panel/master"
+GITHUB_REPO="https://github.com/hnbwww/mac-panel.git"
+GITHUB_RAW="https://raw.githubusercontent.com/hnbwww/mac-panel/master"
 
 # 日志函数
 log_info() {
