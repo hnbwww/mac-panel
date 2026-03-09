@@ -356,6 +356,53 @@ with open('data/db.json', 'w') as f:
     fi
 }
 
+# 创建默认用户
+create_default_user() {
+    log_step "创建默认用户"
+
+    cd "$PROJECT_DIR/backend"
+
+    # 检查是否已有用户
+    if [ -s "data/db.json" ] && grep -q '"users": \[' "data/db.json"; then
+        # 检查 users 数组是否为空
+        if python3 -c "import json; users=json.load(open('data/db.json'))['users']; exit(0 if users else 1)" 2>/dev/null; then
+            log_info "用户已存在，跳过创建"
+            return
+        fi
+    fi
+
+    log_info "创建默认管理员用户..."
+
+    # 生成密码哈希
+    PASSWORD_HASH=$(node -e "const bcrypt=require('bcrypt');bcrypt.hash('admin123',10).then(h=>console.log(h))" 2>/dev/null)
+
+    if [ -z "$PASSWORD_HASH" ]; then
+        log_warn "无法生成密码哈希，跳过创建用户"
+        return
+    fi
+
+    # 添加用户
+    python3 -c "
+import json
+with open('data/db.json', 'r') as f:
+    db = json.load(f)
+db['users'].append({
+    'id': 'user_admin',
+    'username': 'admin',
+    'password_hash': '$PASSWORD_HASH',
+    'email': 'admin@localhost',
+    'role_id': 'role_admin',
+    'created_at': '2026-03-05T16:19:02.447Z',
+    'updated_at': '2026-03-05T16:19:02.447Z',
+    'status': 'active'
+})
+with open('data/db.json', 'w') as f:
+    json.dump(db, f, indent=2)
+"
+
+    log_success "默认用户创建完成 (admin/admin123)"
+}
+
 # 配置权限
 setup_permissions() {
     log_step "配置权限"
@@ -671,6 +718,7 @@ run_install() {
     [ $start_step -le 2 ] && install_and_build
     [ $start_step -le 3 ] && setup_environment
     [ $start_step -le 4 ] && init_database
+    [ $start_step -le 4 ] && create_default_user
     [ $start_step -le 5 ] && setup_permissions
     [ $start_step -le 6 ] && setup_sudoers
     [ $start_step -le 7 ] && create_launch_scripts
