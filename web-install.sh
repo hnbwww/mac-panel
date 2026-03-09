@@ -471,8 +471,9 @@ pkill -f "mac-panel/backend.*app.js" || true
 
 # 启动后端
 cd "$PROJECT_DIR/backend"
+mkdir -p logs
 export NODE_ENV=production
-nohup node dist/app.js > backend/logs/backend.log 2>&1 &
+nohup node dist/app.js > logs/backend.log 2>&1 &
 BACKEND_PID=$!
 echo $BACKEND_PID > backend.pid
 
@@ -487,7 +488,7 @@ echo "   本地: http://localhost:5173"
 echo "   局域网: http://$LOCAL_IP:5173"
 else
     echo "❌ 启动失败，请检查日志"
-    cat backend/logs/backend.log
+    cat logs/backend.log
     exit 1
 fi
 EOF
@@ -525,11 +526,11 @@ case "$ACTION" in
         echo "🚀 启动 Mac Panel..."
         # 以 macpanel 用户启动后端
         if id macpanel &>/dev/null; then
-            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/backend/logs/backend.log 2>&1 &"
+            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/logs/backend.log 2>&1 &"
         else
             cd "$PROJECT_DIR/backend"
             export NODE_ENV=production
-            nohup node dist/app.js > backend/logs/backend.log 2>&1 &
+            nohup node dist/app.js > logs/backend.log 2>&1 &
         fi
         sleep 2
         echo "✅ Mac Panel 已启动"
@@ -562,7 +563,7 @@ case "$ACTION" in
         ;;
     logs)
         echo "📝 最新日志:"
-        tail -50 "$PROJECT_DIR/backend/backend/logs/backend.log"
+        tail -50 "$PROJECT_DIR/backend/logs/backend.log"
         ;;
     update)
         echo "🔄 更新 Mac Panel..."
@@ -589,6 +590,7 @@ start_services() {
     log_step "启动服务"
 
     cd "$PROJECT_DIR/backend"
+    mkdir -p logs
 
     # 停止现有服务
     pkill -f "mac-panel/backend.*app.js" || true
@@ -596,7 +598,7 @@ start_services() {
 
     # 启动后端
     export NODE_ENV=production
-    nohup node dist/app.js > backend/logs/backend.log 2>&1 &
+    nohup node dist/app.js > logs/backend.log 2>&1 &
     BACKEND_PID=$!
     echo $BACKEND_PID > backend.pid
 
@@ -619,7 +621,7 @@ start_services() {
         log_success "后端服务启动成功"
     else
         log_error "后端服务启动失败"
-        tail -20 backend/logs/backend.log
+        tail -20 logs/backend.log
         exit 1
     fi
 }
