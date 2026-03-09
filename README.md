@@ -17,7 +17,7 @@ curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install
 - 👤 创建服务用户和配置权限
 - 🔨 构建并启动服务
 
-**安装完成后访问**：http://localhost:3001
+**安装完成后访问**：http://localhost:5173 (前端) / http://localhost:3001 (后端)
 **默认账号**：admin / admin123
 
 ### 手动安装
@@ -155,8 +155,8 @@ npm run dev
 
 ### 访问应用
 
-- 前端地址: http://localhost:5173
-- 后端地址: http://localhost:3001
+- 前端地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)
+- 后端地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)
 - 默认账号: `admin`
 - 默认密码: `admin123`
 
@@ -212,7 +212,7 @@ mac-panel/
 
 ### 前端 (.env)
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:5173 (前端) / http://localhost:3001 (后端)
 VITE_WS_URL=ws://localhost:3001
 ```
 
@@ -332,7 +332,7 @@ server {
 
     # 反向代理到后端 API
     location /api/ {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:5173 (前端) / http://localhost:3001 (后端);
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -342,7 +342,7 @@ server {
 
     # WebSocket 代理
     location /ws/ {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:5173 (前端) / http://localhost:3001 (后端);
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
