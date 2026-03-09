@@ -436,7 +436,7 @@ sleep 2
 
 if ps -p $BACKEND_PID > /dev/null; then
     echo "✅ Mac Panel 已启动"
-    echo "📱 访问地址: http://localhost:3001"
+    echo "📱 访问地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)"
 else
     echo "❌ 启动失败，请检查日志"
     cat backend.log
@@ -480,7 +480,7 @@ case "$ACTION" in
         nohup node dist/app.js > backend.log 2>&1 &
         echo $! > backend.pid
         echo "✅ Mac Panel 已启动"
-        echo "📱 访问: http://localhost:3001"
+        echo "📱 前端: http://localhost:5173  |  后端: http://localhost:3001"
         ;;
     stop)
         echo "⏹️  停止 Mac Panel..."
@@ -501,7 +501,7 @@ case "$ACTION" in
         echo "📊 Mac Panel 状态:"
         if pgrep -f "mac-panel/backend.*app.js" > /dev/null; then
             echo "✅ 运行中"
-            echo "   访问: http://localhost:3001"
+            echo "   前端: http://localhost:5173  |  后端: http://localhost:3001"
         else
             echo "❌ 未运行"
         fi
@@ -568,7 +568,7 @@ show_completion() {
     echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${CYAN}📱 访问地址：${NC}"
-    echo -e "   ${BLUE}本地: http://localhost:3001${NC}"
+    echo -e "   ${BLUE}前端: http://localhost:5173  |  后端: http://localhost:3001${NC}"
     echo -e "   ${BLUE}局域网: http://$LOCAL_IP:3001${NC}"
     echo ""
     echo -e "${CYAN}🔑 默认账号：${NC}"
