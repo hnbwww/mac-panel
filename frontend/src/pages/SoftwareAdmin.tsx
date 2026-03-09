@@ -441,7 +441,7 @@ const SoftwareAdminPage: React.FC = () => {
             <Input placeholder="/opt/homebrew/etc/mysql/my.cnf" />
           </Form.Item>
 
-          <Divider orientation="left">安装配置</Divider>
+          <Divider >安装配置</Divider>
 
           <Row gutter={16}>
             <Col span={12}>
@@ -463,7 +463,7 @@ const SoftwareAdminPage: React.FC = () => {
             <Input placeholder="8.0, 5.7" />
           </Form.Item>
 
-          <Divider orientation="left">命令配置</Divider>
+          <Divider >命令配置</Divider>
 
           <Form.Item label="安装命令" name={['commands', 'install']}>
             <TextArea rows={2} placeholder="brew install mysql" />
@@ -508,7 +508,7 @@ const SoftwareAdminPage: React.FC = () => {
             <TextArea rows={2} placeholder="brew upgrade mysql" />
           </Form.Item>
 
-          <Divider orientation="left">日志路径</Divider>
+          <Divider >日志路径</Divider>
 
           <Form.Item label="应用日志路径" name={['log_paths', 'application']}>
             <Input placeholder="/opt/homebrew/var/log/mysql.log" />

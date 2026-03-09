@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalEditor } from '../context/GlobalEditorContext';
 import { Table, Button, Input, Modal, Form, message, Popconfirm, Space, Tag, Dropdown, Breadcrumb, Alert, Progress, Upload, Radio, Drawer, List, Empty, Spin, Typography } from 'antd';
-import { HomeOutlined as BreadcrumbHomeIcon } from '@ant-design/icons';
-import type { BreadcrumbProps } from 'antd';
-import { FolderOutlined, FileOutlined, PlusOutlined, UploadOutlined, DownloadOutlined, DeleteOutlined, CopyOutlined, ScissorOutlined, ReloadOutlined, EditOutlined, HomeOutlined, FileZipOutlined, FolderOpenOutlined, SnippetsOutlined, FileTextOutlined, UndoOutlined, SearchOutlined, PictureOutlined, VideoCameraOutlined, AudioOutlined, FilePdfOutlined, FileWordOutlined, FileExcelOutlined, FilePptOutlined, FileMarkdownOutlined, CodeOutlined, DatabaseOutlined, ApiOutlined, SettingOutlined, FileAddOutlined, FolderAddOutlined, StarOutlined, StarFilled, InfoCircleOutlined } from '@ant-design/icons';
 import { useFileStore } from '../store';
 import Editor from '@monaco-editor/react';
 import FileProperties from '../components/FileProperties';
@@ -1390,7 +1387,6 @@ export default function Files() {
                 },
                 {
                   key: 'advanced',
-                  icon: <PlusOutlined />,
                   label: '自定义新建',
                   onClick: () => setCreateModalOpen(true)
                 }
@@ -1398,7 +1394,6 @@ export default function Files() {
             }}
             trigger={['click']}
           >
-            <Button type="primary" icon={<PlusOutlined />}>新建</Button>
           </Dropdown>
           <Button icon={<CodeOutlined />} onClick={handleOpenTerminal} title="在当前目录打开终端">终端</Button>
         </Space>

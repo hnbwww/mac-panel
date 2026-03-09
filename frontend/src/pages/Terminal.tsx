@@ -13,7 +13,7 @@ export default function TerminalPage() {
   const terminalRef = useRef<HTMLDivElement>(null);
   const terminalInstanceRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const { tabs, activeTab, addTab, removeTab, setActiveTab } = useTerminalStore();
 
@@ -83,7 +83,7 @@ export default function TerminalPage() {
     const TERMINAL_WS_URL = import.meta.env.VITE_TERMINAL_WS_URL;
     const wsUrl = `${TERMINAL_WS_URL}/ws/terminal?token=${token}`;
 
-    console.log('[Terminal] Final WebSocket URL:', wsUrl.replace(token, '***'));
+    console.log('[Terminal] Final WebSocket URL:', wsUrl?.replace(token || '', '***'));
     console.log('[Terminal] Expected: ws://192.168.0.7:3002/ws/terminal');
 
     const ws = new WebSocket(wsUrl);

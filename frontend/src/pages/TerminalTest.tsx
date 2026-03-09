@@ -23,7 +23,7 @@ export default function TerminalTestPage() {
     const WS_BASE_URL = import.meta.env.VITE_WS_URL;
     const wsUrl = `${WS_BASE_URL}/ws/terminal?token=${token}`;
 
-    addLog(`Connecting to: ${wsUrl.replace(token, '***')}`);
+    addLog(`Connecting to: ${wsUrl?.replace(token || '', '***')}`);
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;

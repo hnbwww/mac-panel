@@ -124,7 +124,7 @@ export default function ProcessesPage() {
       key: 'name',
       width: 180,
       filteredValue: searchText ? [searchText] : null,
-      onFilter: (value, record) =>
+      onFilter: (value: string, record: ProcessInfo): boolean =>
         record.name.toLowerCase().includes((value as string).toLowerCase()) ||
         record.command.toLowerCase().includes((value as string).toLowerCase()) ||
         (record.fullCommand && record.fullCommand.toLowerCase().includes((value as string).toLowerCase())),
@@ -146,7 +146,7 @@ export default function ProcessesPage() {
         }
         return (
           <Space size={4}>
-            {ports.map(port => (
+            {ports.map((port: string) => (
               <Tag key={port} color="blue">{port}</Tag>
             ))}
           </Space>

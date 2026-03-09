@@ -52,6 +52,7 @@ interface Software {
   category: string;
   installed: boolean;
   version?: string;
+    repair?: string;
   status: 'running' | 'stopped' | 'unknown';
   configPath?: string;
   availableVersions?: string[];
@@ -65,6 +66,7 @@ interface Software {
     restart?: string;
     status?: string;
     version?: string;
+    repair?: string;
   };
 }
 

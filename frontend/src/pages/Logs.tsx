@@ -19,15 +19,12 @@ import {
   ReloadOutlined,
   SearchOutlined,
   EyeOutlined,
-  DeleteOutlined,
   FileTextOutlined,
   UserOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import './Logs/Logs.css';
 import dayjs from 'dayjs';
 import { API_BASE_URL } from '../config';
 import './Logs.css';

@@ -12,7 +12,6 @@ import {
   CloseOutlined,
   FolderOutlined,
   FileOutlined,
-  PlusOutlined,
   InfoCircleOutlined,
   SwapOutlined,
   MinusOutlined,
