@@ -472,7 +472,7 @@ pkill -f "mac-panel/backend.*app.js" || true
 # 启动后端
 cd "$PROJECT_DIR/backend"
 export NODE_ENV=production
-nohup node dist/app.js > backend.log 2>&1 &
+nohup node dist/app.js > backend/logs/backend.log 2>&1 &
 BACKEND_PID=$!
 echo $BACKEND_PID > backend.pid
 
@@ -487,7 +487,7 @@ echo "   本地: http://localhost:5173"
 echo "   局域网: http://$LOCAL_IP:5173"
 else
     echo "❌ 启动失败，请检查日志"
-    cat backend.log
+    cat backend/logs/backend.log
     exit 1
 fi
 EOF
@@ -525,11 +525,11 @@ case "$ACTION" in
         echo "🚀 启动 Mac Panel..."
         # 以 macpanel 用户启动后端
         if id macpanel &>/dev/null; then
-            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/backend.log 2>&1 &"
+            sudo -u macpanel bash -c "cd /opt/mac-panel/backend && export NODE_ENV=production && nohup node dist/app.js > /opt/mac-panel/backend/backend/logs/backend.log 2>&1 &"
         else
             cd "$PROJECT_DIR/backend"
             export NODE_ENV=production
-            nohup node dist/app.js > backend.log 2>&1 &
+            nohup node dist/app.js > backend/logs/backend.log 2>&1 &
         fi
         sleep 2
         echo "✅ Mac Panel 已启动"
@@ -562,7 +562,7 @@ case "$ACTION" in
         ;;
     logs)
         echo "📝 最新日志:"
-        tail -50 "$PROJECT_DIR/backend/backend.log"
+        tail -50 "$PROJECT_DIR/backend/backend/logs/backend.log"
         ;;
     update)
         echo "🔄 更新 Mac Panel..."
@@ -596,18 +596,30 @@ start_services() {
 
     # 启动后端
     export NODE_ENV=production
-    nohup node dist/app.js > backend.log 2>&1 &
+    nohup node dist/app.js > backend/logs/backend.log 2>&1 &
     BACKEND_PID=$!
     echo $BACKEND_PID > backend.pid
 
     sleep 3
 
+    # 启动前端
+    log_info "启动前端..."
+    cd "$PROJECT_DIR/frontend"
+    nohup npm run dev > "$PROJECT_DIR/frontend/vite.log" 2>&1 &
+    FRONTEND_PID=$!
+    echo $FRONTEND_PID > frontend.pid
+    sleep 3
+    if lsof -i :5173 > /dev/null 2>&1; then
+        log_success "前端服务启动成功"
+    else
+        log_warn "前端启动可能有异常"
+    fi
     # 验证服务
     if curl -s http://localhost:3001/health > /dev/null; then
         log_success "后端服务启动成功"
     else
         log_error "后端服务启动失败"
-        tail -20 backend.log
+        tail -20 backend/logs/backend.log
         exit 1
     fi
 }
@@ -623,7 +635,7 @@ show_completion() {
     echo ""
     echo -e "${CYAN}📱 访问地址：${NC}"
     echo -e "   ${BLUE}前端: http://localhost:5173  |  后端: http://localhost:3001${NC}"
-    echo -e "   ${BLUE}局域网: http://$LOCAL_IP:3001${NC}"
+    echo -e "   ${BLUE}局域网前端: http://$LOCAL_IP:5173\n   局域网后端: http://$LOCAL_IP:3001${NC}"
     echo ""
     echo -e "${CYAN}🔑 默认账号：${NC}"
     echo -e "   ${YELLOW}用户名: admin${NC}"
