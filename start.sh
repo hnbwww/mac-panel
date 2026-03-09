@@ -21,7 +21,7 @@ sleep 2
 
 if ps -p $BACKEND_PID > /dev/null; then
     echo "✅ Mac Panel 已启动"
-    echo "📱 访问地址: http://localhost:3001"
+    echo "📱 访问地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)"
 else
     echo "❌ 启动失败，请检查日志"
     cat backend.log

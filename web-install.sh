@@ -436,7 +436,11 @@ sleep 2
 
 if ps -p $BACKEND_PID > /dev/null; then
     echo "✅ Mac Panel 已启动"
-    echo "📱 访问地址: http://localhost:5173 (前端) / http://localhost:3001 (后端)"
+    # 获取本机 IP
+LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
+echo "📱 访问地址:"
+echo "   本地: http://localhost:5173"
+echo "   局域网: http://$LOCAL_IP:5173"
 else
     echo "❌ 启动失败，请检查日志"
     cat backend.log
