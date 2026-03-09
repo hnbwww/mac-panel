@@ -7,7 +7,11 @@
 ### 一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh | sudo bash
+# 下载安装脚本到本地
+curl -fsSL https://raw.githubusercontent.com/hnbwww/mac-panel/master/web-install.sh -o /tmp/web-install.sh
+
+# 运行安装脚本
+sudo bash /tmp/web-install.sh
 ```
 
 **就这么简单！** 安装脚本会自动：

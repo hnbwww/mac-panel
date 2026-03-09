@@ -606,16 +606,50 @@ detect_progress() {
     echo $step
 }
 
+# 卸载 Mac Panel
+uninstall() {
+    log_step "卸载 Mac Panel"
+
+    log_info "停止服务..."
+    pkill -f "mac-panel/backend.*app.js" || true
+    pkill -f "vite" || true
+
+    log_info "删除管理命令..."
+    rm -f /usr/local/bin/mac-panel
+
+    if [ -d "$PROJECT_DIR" ]; then
+        log_info "删除项目目录: $PROJECT_DIR"
+        rm -rf "$PROJECT_DIR"
+    fi
+
+    if [ -f "/etc/sudoers.d/mac-panel" ]; then
+        log_info "删除 sudoers 配置..."
+        rm -f /etc/sudoers.d/mac-panel
+    fi
+
+    if id "macpanel" &>/dev/null; then
+        read -p "是否删除 macpanel 用户? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            log_info "删除用户..."
+            sudo sysadminctl -deleteUser macpanel 2>/dev/null || sudo userdel macpanel 2>/dev/null || true
+        fi
+    fi
+
+    log_success "卸载完成！"
+}
+
 # 显示安装菜单
 show_menu() {
     echo ""
-    echo -e "${CYAN}请选择安装模式：${NC}"
+    echo -e "${CYAN}请选择操作：${NC}"
     echo ""
     echo -e "  ${GREEN}1${NC}. 全新安装（从第一步开始）"
     echo -e "  ${GREEN}2${NC}. 继续安装（从中断处继续）"
     echo -e "  ${GREEN}3${NC}. 选择步骤（指定从哪一步开始）"
+    echo -e "  ${GREEN}4${NC}. 卸载（删除所有文件和配置）"
     echo ""
-    echo -n "请输入选项 [1-3]: "
+    echo -n "请输入选项 [1-4]: "
 }
 
 # 执行安装流程
@@ -700,6 +734,10 @@ main() {
                 log_error "无效的步骤"
                 exit 1
             fi
+            ;;
+        4)
+            uninstall
+            exit 0
             ;;
         *)
             log_error "无效选项"
