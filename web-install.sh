@@ -170,9 +170,9 @@ create_user() {
     fi
 }
 
-# 克隆项目
+# 克隆或检查项目（支持断点续装）
 clone_project() {
-    log_step "下载 Mac Panel 项目"
+    log_step "检查项目"
 
     # 检查git
     if ! command -v git &> /dev/null; then
@@ -180,58 +180,94 @@ clone_project() {
         brew install git > /dev/null 2>&1
     fi
 
-    # 克隆项目
+    # 检查项目目录是否存在
     if [ -d "$PROJECT_DIR" ]; then
-        log_warn "项目目录已存在"
-        read -p "是否删除并重新安装? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            sudo rm -rf "$PROJECT_DIR"
+        log_info "项目目录已存在: $PROJECT_DIR"
+
+        # 检查是否为有效的项目目录
+        if [ -f "$PROJECT_DIR/package.json" ] || [ -f "$PROJECT_DIR/backend/package.json" ] || [ -f "$PROJECT_DIR/README.md" ]; then
+            log_success "检测到有效的项目目录，跳过克隆"
+            log_info "如需重新克隆，请先删除目录: sudo rm -rf $PROJECT_DIR"
         else
-            log_error "安装已取消"
-            exit 1
+            log_warn "目录存在但不是有效的项目目录"
+            read -p "是否删除并重新克隆? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                echo "520131" | sudo -S rm -rf "$PROJECT_DIR"
+            else
+                log_error "安装已取消"
+                exit 1
+            fi
         fi
     fi
 
-    log_info "📥 正在从 GitHub 克隆项目..."
-    if git clone "$GITHUB_REPO" "$PROJECT_DIR" 2>/dev/null; then
-        log_success "项目克隆成功"
-    else
-        log_error "项目克隆失败"
-        exit 1
+    # 如果目录不存在，执行克隆
+    if [ ! -d "$PROJECT_DIR" ]; then
+        log_info "📥 正在从 GitHub 克隆项目..."
+        log_info "仓库地址: $GITHUB_REPO"
+
+        # 设置 HTTP 版本避免 HTTP2 问题
+        export GIT_HTTP_VERSION=1.1
+
+        if git clone --depth 1 "$GITHUB_REPO" "$PROJECT_DIR"; then
+            log_success "项目克隆成功"
+        else
+            log_error "项目克隆失败"
+            log_error "请检查: 1. 网络是否正常 2. 是否需要代理"
+            log_error "或手动下载项目放入: $PROJECT_DIR"
+            exit 1
+        fi
     fi
 
     cd "$PROJECT_DIR"
 }
 
-# 安装依赖并构建
+# 安装依赖并构建（支持断点续装）
 install_and_build() {
     log_step "安装依赖并构建"
 
-    # 安装后端依赖
-    log_info "📦 安装后端依赖..."
     cd "$PROJECT_DIR/backend"
-    npm install --production=false > /dev/null 2>&1
-    log_success "后端依赖安装完成"
 
-    # 构建后端
-    log_info "🔨 构建后端..."
-    npm run build > /dev/null 2>&1
-    log_success "后端构建完成"
+    # 安装后端依赖（如果 node_modules 已存在则跳过）
+    if [ -d "node_modules" ]; then
+        log_info "后端依赖已存在，跳过安装"
+    else
+        log_info "📦 安装后端依赖..."
+        npm install --production=false > /dev/null 2>&1
+        log_success "后端依赖安装完成"
+    fi
 
-    # 安装前端依赖
-    log_info "📦 安装前端依赖..."
+    # 构建后端（如果 dist 目录已存在则跳过）
+    if [ -d "dist" ] && [ -n "$(ls -A dist 2>/dev/null)" ]; then
+        log_info "后端已构建，跳过"
+    else
+        log_info "🔨 构建后端..."
+        npm run build > /dev/null 2>&1
+        log_success "后端构建完成"
+    fi
+
     cd "$PROJECT_DIR/frontend"
-    npm install > /dev/null 2>&1
-    log_success "前端依赖安装完成"
 
-    # 构建前端
-    log_info "🔨 构建前端..."
-    npm run build > /dev/null 2>&1
-    log_success "前端构建完成"
+    # 安装前端依赖（如果 node_modules 已存在则跳过）
+    if [ -d "node_modules" ]; then
+        log_info "前端依赖已存在，跳过安装"
+    else
+        log_info "📦 安装前端依赖..."
+        npm install > /dev/null 2>&1
+        log_success "前端依赖安装完成"
+    fi
+
+    # 构建前端（如果 dist 目录已存在则跳过）
+    if [ -d "dist" ] && [ -n "$(ls -A dist 2>/dev/null)" ]; then
+        log_info "前端已构建，跳过"
+    else
+        log_info "🔨 构建前端..."
+        npm run build > /dev/null 2>&1
+        log_success "前端构建完成"
+    fi
 }
 
-# 配置环境
+# 配置环境（支持断点续装）
 setup_environment() {
     log_step "配置环境"
 
@@ -254,6 +290,8 @@ JWT_SECRET=$(openssl rand -hex 32)
 EOF
 
         log_success "后端环境配置完成"
+    else
+        log_info "后端环境配置已存在，跳过"
     fi
 
     # 前端环境配置
@@ -265,10 +303,12 @@ VITE_TERMINAL_WS_URL=ws://localhost:3002/ws/terminal
 VITE_BROWSER_WS_URL=ws://localhost:3003/ws/browser
 EOF
         log_success "前端环境配置完成"
+    else
+        log_info "前端环境配置已存在，跳过"
     fi
 }
 
-# 初始化数据库
+# 初始化数据库（支持断点续装）
 init_database() {
     log_step "初始化数据库"
 
@@ -290,6 +330,8 @@ init_database() {
 }
 EOF
         log_success "数据库文件已创建"
+    else
+        log_info "数据库已存在，跳过初始化"
     fi
 }
 
@@ -527,32 +569,124 @@ show_completion() {
 }
 
 # 主函数
+# 检测当前安装进度
+detect_progress() {
+    local step=0
+
+    # 检查各步骤完成状态
+    [ -d "$PROJECT_DIR" ] && [ -f "$PROJECT_DIR/backend/package.json" ] && step=1
+    [ -d "$PROJECT_DIR/backend/node_modules" ] && [ -d "$PROJECT_DIR/backend/dist" ] && step=2
+    [ -d "$PROJECT_DIR/frontend/node_modules" ] && [ -d "$PROJECT_DIR/frontend/dist" ] && step=3
+    [ -f "$PROJECT_DIR/backend/.env" ] && [ -f "$PROJECT_DIR/frontend/.env" ] && step=4
+    [ -f "$PROJECT_DIR/backend/data/db.json" ] && step=5
+    pgrep -f "mac-panel/backend.*app.js" > /dev/null 2>&1 && step=6
+
+    echo $step
+}
+
+# 显示安装菜单
+show_menu() {
+    echo ""
+    echo -e "${CYAN}请选择安装模式：${NC}"
+    echo ""
+    echo -e "  ${GREEN}1${NC}. 全新安装（从第一步开始）"
+    echo -e "  ${GREEN}2${NC}. 继续安装（从中断处继续）"
+    echo -e "  ${GREEN}3${NC}. 选择步骤（指定从哪一步开始）"
+    echo ""
+    echo -n "请输入选项 [1-3]: "
+}
+
+# 执行安装流程
+run_install() {
+    local start_step=$1
+
+    # 根据起始步骤执行
+    [ $start_step -le 1 ] && clone_project
+    [ $start_step -le 2 ] && install_and_build
+    [ $start_step -le 3 ] && setup_environment
+    [ $start_step -le 4 ] && init_database
+    [ $start_step -le 5 ] && setup_permissions
+    [ $start_step -le 6 ] && setup_sudoers
+    [ $start_step -le 7 ] && create_launch_scripts
+    [ $start_step -le 8 ] && configure_firewall
+    [ $start_step -le 9 ] && start_services
+    [ $start_step -le 10 ] && create_management_scripts
+}
+
 main() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║   Mac Panel 网络一键安装 v3.0              ║${NC}"
-    echo -e "${BLUE}║   支持 macOS 12.0+                        ║${NC}"
+    echo -e "${BLUE}║   Mac Panel 网络一键安装 v3.1              ║${NC}"
+    echo -e "${BLUE}║   支持断点续装 + macOS 12.0+              ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 
-    # 安装流程
+    # 预先执行基础检查
     check_sudo
     check_macos_version
     install_homebrew
     install_nodejs
     create_user
-    clone_project
-    install_and_build
-    setup_environment
-    init_database
-    setup_permissions
-    setup_sudoers
-    create_launch_scripts
-    configure_firewall
-    start_services
-    create_management_scripts
-    show_completion
 
-    echo -e "${GREEN}网络一键安装完成！🎊${NC}"
+    # 检测当前进度
+    local current_step=$(detect_progress)
+    local step_names=("" "项目已下载" "依赖已安装" "项目已构建" "环境已配置" "数据库已初始化" "服务已启动")
+
+    if [ $current_step -gt 0 ]; then
+        echo -e "${YELLOW}检测到已安装步骤: ${step_names[$current_step]}${NC}"
+        echo ""
+    fi
+
+    # 显示菜单
+    show_menu
+
+    read -n 1 -r choice
+    echo ""
+
+    case $choice in
+        1)
+            # 全新安装
+            log_info "开始全新安装..."
+            run_install 1
+            ;;
+        2)
+            # 继续安装
+            log_info "继续安装..."
+            run_install $((current_step + 1))
+            ;;
+        3)
+            # 选择步骤
+            echo ""
+            echo -e "${CYAN}可用步骤：${NC}"
+            echo "  1. 克隆项目"
+            echo "  2. 安装依赖并构建"
+            echo "  3. 配置环境变量"
+            echo "  4. 初始化数据库"
+            echo "  5. 配置权限"
+            echo "  6. 配置 sudoers"
+            echo "  7. 创建启动脚本"
+            echo "  8. 配置防火墙"
+            echo "  9. 启动服务"
+            echo "  10. 创建管理命令"
+            echo ""
+            echo -n "请输入起始步骤 [1-10]: "
+            read -n 1 -r start_step
+            echo ""
+            if [[ "$start_step" =~ ^[1-9]$|^10$ ]]; then
+                log_info "从步骤 $start_step 开始安装..."
+                run_install $start_step
+            else
+                log_error "无效的步骤"
+                exit 1
+            fi
+            ;;
+        *)
+            log_error "无效选项"
+            exit 1
+            ;;
+    esac
+
+    show_completion
+    echo -e "${GREEN}安装完成！🎊${NC}"
 }
 
 # 运行主函数
