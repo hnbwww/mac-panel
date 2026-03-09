@@ -297,7 +297,7 @@ EOF
     # 前端环境配置
     if [ ! -f "frontend/.env" ]; then
         cat > frontend/.env << EOF
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=
 VITE_WS_URL=ws://localhost:3001/ws
 VITE_TERMINAL_WS_URL=ws://localhost:3002/ws/terminal
 VITE_BROWSER_WS_URL=ws://localhost:3003/ws/browser
