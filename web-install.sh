@@ -479,20 +479,26 @@ ACTION="$1"
 case "$ACTION" in
     start)
         echo "🚀 启动 Mac Panel..."
-        cd "$PROJECT_DIR/backend"
-        export NODE_ENV=production
-        nohup node dist/app.js > backend.log 2>&1 &
-        echo $! > backend.pid
+        # 以 macpanel 用户启动后端
+        if id macpanel &>/dev/null; then
+            sudo -u macpanel bash -c 'cd "$PROJECT_DIR/backend" && export NODE_ENV=production && nohup node dist/app.js > backend.log 2>&1 &'
+        else
+            cd "$PROJECT_DIR/backend"
+            export NODE_ENV=production
+            nohup node dist/app.js > backend.log 2>&1 &
+        fi
+        sleep 2
         echo "✅ Mac Panel 已启动"
-        echo "📱 前端: http://localhost:5173  |  后端: http://localhost:3001"
+        # 获取本机 IP
+        LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
+        echo "📱 前端: http://localhost:5173"
+        echo "📱 局域网: http://$LOCAL_IP:5173"
         ;;
     stop)
         echo "⏹️  停止 Mac Panel..."
-        if [ -f "$PROJECT_DIR/backend/backend.pid" ]; then
-            kill $(cat "$PROJECT_DIR/backend/backend.pid") 2>/dev/null || true
-            rm -f "$PROJECT_DIR/backend/backend.pid"
-        fi
         pkill -f "mac-panel/backend.*app.js" || true
+        pkill -f "vite" || true
+        sleep 1
         echo "✅ Mac Panel 已停止"
         ;;
     restart)
