@@ -484,8 +484,8 @@ if ps -p $BACKEND_PID > /dev/null; then
     # 获取本机 IP
 LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
 echo "📱 访问地址:"
-echo "   本地: http://localhost:5173"
-echo "   局域网: http://$LOCAL_IP:5173"
+echo "   本地: http://localhost:5188"
+echo "   局域网: http://$LOCAL_IP:5188"
 else
     echo "❌ 启动失败，请检查日志"
     cat logs/backend.log
@@ -536,8 +536,8 @@ case "$ACTION" in
         echo "✅ Mac Panel 已启动"
         # 获取本机 IP
         LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
-        echo "📱 前端: http://localhost:5173"
-        echo "📱 局域网: http://$LOCAL_IP:5173"
+        echo "📱 前端: http://localhost:5188"
+        echo "📱 局域网: http://$LOCAL_IP:5188"
         ;;
     stop)
         echo "⏹️  停止 Mac Panel..."
@@ -556,7 +556,7 @@ case "$ACTION" in
         echo "📊 Mac Panel 状态:"
         if pgrep -f "node.*app.js" > /dev/null; then
             echo "✅ 运行中"
-            echo "   前端: http://localhost:5173  |  后端: http://localhost:3001"
+            echo "   前端: http://localhost:5188  |  后端: http://localhost:3001"
         else
             echo "❌ 未运行"
         fi
@@ -611,7 +611,7 @@ start_services() {
     FRONTEND_PID=$!
     echo $FRONTEND_PID > frontend.pid
     sleep 3
-    if lsof -i :5173 > /dev/null 2>&1; then
+    if lsof -i :5188 > /dev/null 2>&1; then
         log_success "前端服务启动成功"
     else
         log_warn "前端启动可能有异常"
@@ -636,8 +636,8 @@ show_completion() {
     echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${CYAN}📱 访问地址：${NC}"
-    echo -e "   ${BLUE}前端: http://localhost:5173  |  后端: http://localhost:3001${NC}"
-    echo -e "   ${BLUE}局域网前端: http://$LOCAL_IP:5173\n   局域网后端: http://$LOCAL_IP:3001${NC}"
+    echo -e "   ${BLUE}前端: http://localhost:5188  |  后端: http://localhost:3001${NC}"
+    echo -e "   ${BLUE}局域网前端: http://$LOCAL_IP:5188\n   局域网后端: http://$LOCAL_IP:3001${NC}"
     echo ""
     echo -e "${CYAN}🔑 默认账号：${NC}"
     echo -e "   ${YELLOW}用户名: admin${NC}"

@@ -403,7 +403,7 @@ setup_environment() {
 # Mac Panel Backend Configuration
 NODE_ENV=production
 PORT=3001
-FRONTEND_PORT=5173
+FRONTEND_PORT=5188
 
 # 允许的主机（添加你的局域网IP）
 ALLOWED_HOSTS=localhost,127.0.0.1,$LOCAL_IP
@@ -638,7 +638,7 @@ configure_firewall() {
         # 添加端口规则
         sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/nginx 2>/dev/null || true
         sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add 3001 2>/dev/null || true
-        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add 5173 2>/dev/null || true
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add 5188 2>/dev/null || true
 
         # 允许传入连接
         sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on 2>/dev/null || true

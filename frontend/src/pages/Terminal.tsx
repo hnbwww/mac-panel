@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, Button, Space } from 'antd';
-import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import { Card, Button, Space, message } from 'antd';
+import { PlusOutlined, CloseOutlined, SyncOutlined } from '@ant-design/icons';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { useTerminalStore } from '../store';
@@ -14,24 +14,40 @@ export default function TerminalPage() {
   const terminalInstanceRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttemptsRef = useRef(0);
   const [isConnected, setIsConnected] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const { tabs, activeTab, addTab, removeTab, setActiveTab } = useTerminalStore();
+  const terminalRef2 = useRef<Terminal | null>(null);
+
+  // 清理函数
+  const cleanup = useCallback(() => {
+    console.log('[Terminal] Cleaning up...');
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current);
+      heartbeatIntervalRef.current = null;
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    if (wsRef.current) {
+      console.log('[Terminal] Closing WebSocket');
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     console.log('[Terminal] Component mounted');
     initTerminal();
 
     return () => {
-      console.log('[Terminal] Component unmounting, cleaning up...');
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        console.log('[Terminal] Closing WebSocket on unmount');
-        wsRef.current.close();
-      }
+      cleanup();
     };
-  }, []);
+  }, [cleanup]);
 
   const initTerminal = () => {
     console.log('[Terminal] Initializing terminal...');
@@ -59,14 +75,24 @@ export default function TerminalPage() {
     fitAddon.fit();
 
     terminalInstanceRef.current = { terminal, fitAddon };
+    terminalRef2.current = terminal;
     console.log('[Terminal] Terminal instance created');
 
     // Connect to WebSocket
     connectWebSocket(terminal);
   };
 
-  const connectWebSocket = (terminal: Terminal) => {
-    console.log('[Terminal] Connecting to WebSocket...');
+  // 手动重连
+  const handleReconnect = useCallback(() => {
+    console.log('[Terminal] Manual reconnect requested');
+    reconnectAttemptsRef.current = 0;
+    if (terminalRef2.current) {
+      connectWebSocket(terminalRef2.current, true);
+    }
+  }, []);
+
+  const connectWebSocket = (terminal: Terminal, isReconnect = false) => {
+    console.log('[Terminal] Connecting to WebSocket...' + (isReconnect ? ' (reconnect)' : ''));
     const token = localStorage.getItem('token');
 
     // 调试：检查环境变量
@@ -88,14 +114,43 @@ export default function TerminalPage() {
 
     console.log('[Terminal] Final WebSocket URL:', wsUrl?.replace(token || '', '***'));
 
+    // 如果已有连接，先关闭
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
+
+    // 心跳定时器
+    const startHeartbeat = () => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+      }
+      heartbeatIntervalRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'ping' }));
+          console.log('[Terminal] Sent ping');
+        }
+      }, 30000); // 每30秒发送一次心跳
+    };
 
     ws.onopen = () => {
       console.log('[Terminal] WebSocket onopen fired');
       setIsConnected(true);
-      terminal.clear();
-      terminal.write('\r\n✓ Connecting to terminal...\r\n');
+      setIsReconnecting(false);
+      reconnectAttemptsRef.current = 0;
+
+      if (isReconnect) {
+        terminal.write('\r\n✓ Reconnected\r\n');
+        message.success('终端已重新连接');
+      } else {
+        terminal.clear();
+        terminal.write('\r\n✓ Connecting to terminal...\r\n');
+      }
+
+      // 启动心跳
+      startHeartbeat();
     };
 
     ws.onmessage = (event) => {
@@ -171,8 +226,41 @@ export default function TerminalPage() {
 
     ws.onclose = (event) => {
       console.log('[Terminal] WebSocket onclose:', { code: event.code, reason: event.reason, wasClean: event.wasClean });
-      terminal.write(`\r\n✗ Connection closed (code: ${event.code})\r\n`);
+
+      // 清除心跳定时器
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+
       setIsConnected(false);
+
+      // 非正常关闭，尝试重连
+      if (!event.wasClean || event.code !== 1000) {
+        terminal.write(`\r\n✗ Connection lost (code: ${event.code}), reconnecting...\r\n`);
+
+        const maxReconnectAttempts = 5;
+        const baseDelay = 1000;
+
+        if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+          const delay = baseDelay * Math.pow(2, reconnectAttemptsRef.current); // 指数退避
+          reconnectAttemptsRef.current++;
+          setIsReconnecting(true);
+
+          console.log(`[Terminal] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
+
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (terminalInstanceRef.current) {
+              connectWebSocket(terminalInstanceRef.current.terminal, true);
+            }
+          }, delay);
+        } else {
+          terminal.write(`\r\n✗ Max reconnection attempts reached. Please refresh the page.\r\n`);
+          message.error('连接断开，请刷新页面重试');
+        }
+      } else {
+        terminal.write(`\r\n✗ Connection closed\r\n`);
+      }
     };
 
     terminal.onData((data: string) => {
@@ -256,8 +344,18 @@ export default function TerminalPage() {
         <Space>
           <div className="connection-status">
             <span className={`status-indicator ${isConnected ? 'connected' : ''}`} />
-            {isConnected ? '已连接' : '未连接'}
+            {isConnected ? '已连接' : isReconnecting ? '重连中...' : '未连接'}
           </div>
+          {!isConnected && (
+            <Button
+              type="text"
+              icon={<SyncOutlined spin={isReconnecting} />}
+              onClick={handleReconnect}
+              disabled={isReconnecting}
+            >
+              {isReconnecting ? '重连中' : '重连'}
+            </Button>
+          )}
         </Space>
       </div>
 
